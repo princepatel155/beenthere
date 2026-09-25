@@ -4,7 +4,9 @@
 
 [build.environment]
   NODE_VERSION = "24"
-  NEXT_TELEMETRY_DISABLED = "1"
+    NEXT_TELEMETRY_DISABLED = "1"
+    # These are public identifiers, not credentials. Keep scanning MONGODB_URI.
+    SECRETS_SCAN_OMIT_KEYS = "GOOGLE_CLIENT_ID,MONGODB_DB_NAME"
 
 [dev]
   command = "npm run dev"
