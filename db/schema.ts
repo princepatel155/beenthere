@@ -1,0 +1,11 @@
+import { sqliteTable, text, integer, primaryKey, index } from 'drizzle-orm/sqlite-core';
+export const posts = sqliteTable('posts', {
+ id:text('id').primaryKey(), userId:text('user_id').notNull(), author:text('author').notNull(), kind:text('kind').notNull(), destination:text('destination').notNull(), state:text('state').notNull(), category:text('category').notNull(), title:text('title').notNull(), body:text('body').notNull(), rating:integer('rating').notNull(), price:integer('price'), visited:text('visited').notNull(), tripType:text('trip_type').notNull(), photos:text('photos').notNull().default('[]'), created:text('created').notNull()
+}, t=>[index('idx_posts_created').on(t.created),index('idx_posts_destination').on(t.destination),index('idx_posts_user').on(t.userId)]);
+export const votes = sqliteTable('votes',{postId:text('post_id').notNull(),userId:text('user_id').notNull(),kind:text('kind').notNull()},t=>[primaryKey({columns:[t.postId,t.userId,t.kind]})]);
+export const saves = sqliteTable('saves',{postId:text('post_id').notNull(),userId:text('user_id').notNull(),collection:text('collection').notNull()},t=>[primaryKey({columns:[t.postId,t.userId]}),index('idx_saves_user').on(t.userId)]);
+export const comments = sqliteTable('comments',{id:text('id').primaryKey(),postId:text('post_id').notNull(),userId:text('user_id').notNull(),author:text('author').notNull(),body:text('body').notNull(),created:text('created').notNull()},t=>[index('idx_comments_post').on(t.postId)]);
+export const photos = sqliteTable('photos',{id:text('id').primaryKey(),userId:text('user_id').notNull(),mime:text('mime').notNull()});
+export const accounts=sqliteTable('accounts',{id:text('id').primaryKey(),googleSub:text('google_sub').notNull().unique(),email:text('email').notNull(),name:text('name').notNull(),created:text('created').notNull()});
+export const sessions=sqliteTable('sessions',{tokenHash:text('token_hash').primaryKey(),userId:text('user_id').notNull().references(()=>accounts.id),expires:integer('expires').notNull()},t=>[index('idx_sessions_expires').on(t.expires)]);
+export const loginNonces=sqliteTable('login_nonces',{tokenHash:text('token_hash').primaryKey(),expires:integer('expires').notNull()},t=>[index('idx_login_nonces_expires').on(t.expires)]);
