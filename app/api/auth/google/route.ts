@@ -24,8 +24,8 @@ export async function POST(request:Request){
   if(!consumed)return fail('This sign-in request has expired or was already used. Please reload.',401);
   const id='google:'+identity.subject;
   const account=await d.collection('accounts').updateOne({id},{
-   $set:{google_sub:identity.subject,email:identity.email,name:identity.name},
-   $setOnInsert:{created:new Date().toISOString()}
+   $set:{google_sub:identity.subject,email:identity.email},
+   $setOnInsert:{name:identity.name,created:new Date().toISOString()}
   },{upsert:true});
   const session=randomToken(),oldSession=requestCookie(request,SESSION_COOKIE);
   if(oldSession)await d.collection('sessions').deleteOne({token_hash:await hashToken(oldSession)});

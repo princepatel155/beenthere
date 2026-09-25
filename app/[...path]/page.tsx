@@ -1,7 +1,8 @@
-import { notFound } from 'next/navigation';
+import { notFound,permanentRedirect } from 'next/navigation';
 import Community from '../community';
 import { getCurrentUser } from '../auth/session';
 import { destinations } from '../data';
+import { destinationPath } from '../catalog';
 import { pageMetadata } from '../seo';
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,7 @@ export async function generateMetadata({ params }: Props) {
     if (path[0] === 'explore') return pageMetadata('Explore India | Kisse Safar Ke', 'Explore destinations across India with Kisse Safar Ke. Discover mountains, beaches, heritage places and ideas for your next trip.', url);
     if (path[0] === 'stories') return pageMetadata('Travel Stories & Itineraries | Kisse Safar Ke', 'Browse trip stories, itineraries and travel experiences on Kisse Safar Ke. Illustrative sample stories are clearly labeled.', url);
     if (path[0] === 'saved') return pageMetadata('Saved Trips | Kisse Safar Ke', 'Your saved experiences and travel collections.', url, false);
+    if (path[0] === 'moderation') return pageMetadata('Moderation | Kisse Safar Ke', 'Community moderation.', url, false);
     if (path[0] === 'profile') return pageMetadata('Your Profile | Kisse Safar Ke', 'Your personal traveler profile and contributions.', url, false);
   }
   if (path.length === 2 && path[0] === 'destination') {
@@ -28,9 +30,10 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function Page({ params }: Props) {
   const { path } = await params;
-  const knownPage = path.length === 1 && ['explore', 'stories', 'saved', 'profile'].includes(path[0]);
-  const communityPage = path.length === 2 && ['destination', 'experience'].includes(path[0]);
+  const knownPage = path.length === 1 && ['explore', 'stories', 'saved', 'profile', 'moderation'].includes(path[0]);
+  const communityPage = path.length === 2 && ['destination', 'experience', 'travelers'].includes(path[0]);
   if (!knownPage && !communityPage) notFound();
+  if(path[0]==='destination'){const destination=destinations.find(d=>d.name.toLowerCase()===path[1].toLowerCase());if(destination)permanentRedirect(destinationPath(destination.name,destination.state));}
   const user = await getCurrentUser();
   return <Community user={user ? { id: user.userId, name: user.fullName || 'Traveler' } : null} signInPath="/login" />;
 }

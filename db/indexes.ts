@@ -2,7 +2,15 @@ import type { Db } from 'mongodb';
 
 export async function ensureIndexes(db: Db) {
   await Promise.all([
-    ...['accounts', 'posts', 'photos', 'comments'].map(name => db.collection(name).createIndex({ id: 1 }, { unique: true })),
+    ...['accounts', 'posts', 'photos', 'comments', 'trips', 'reports', 'destinations', 'places', 'moderation_actions'].map(name => db.collection(name).createIndex({ id: 1 }, { unique: true })),
+    db.collection('accounts').createIndex({ username: 1 }, { unique: true, partialFilterExpression: { username: { $type: 'string' } } }),
+    db.collection('trips').createIndex({ user_id: 1, key: 1 }, { unique: true }),
+    db.collection('trip_items').createIndex({ trip_id: 1, kind: 1, target_id: 1 }, { unique: true }),
+    db.collection('trip_items').createIndex({ user_id: 1 }),
+    db.collection('reports').createIndex({ user_id: 1, kind: 1, target_id: 1 }, { unique: true }),
+    db.collection('reports').createIndex({ status: 1, created: 1 }),
+    db.collection('posts').createIndex({ destination_id: 1, created: -1 }),
+    db.collection('comments').createIndex({ post_id: 1, created: 1 }),
     db.collection('accounts').createIndex({ google_sub: 1 }, { unique: true }),
     db.collection('sessions').createIndex({ token_hash: 1 }, { unique: true }),
     db.collection('sessions').createIndex({ expires: 1 }, { expireAfterSeconds: 0 }),

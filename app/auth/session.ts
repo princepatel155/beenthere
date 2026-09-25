@@ -24,6 +24,6 @@ export async function getCurrentUser(){
  const d=await database();
  const session=await d.collection('sessions').findOne({token_hash:await hashToken(token),expires:{$gt:new Date()}});
  if(!session)return null;
- const result=await d.collection<{id:string;name:string}>('accounts').findOne({id:session.user_id});
- return result?{userId:result.id,displayName:result.name,fullName:result.name}:null;
+ const result=await d.collection<{id:string;name:string;email?:string}>('accounts').findOne({id:session.user_id});
+ return result?{userId:result.id,displayName:result.name,fullName:result.name,email:result.email}:null;
 }

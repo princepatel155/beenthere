@@ -1,3 +1,4 @@
+import { visible,publicPosts } from '../../product-server';
 import { database } from '../../../db';
 import { getCurrentUser } from '../../auth/session';
 import { searchTerms } from '../../experience-utils';
@@ -16,13 +17,14 @@ export async function GET(request: Request) {
     const clauses: Record<string, unknown>[] = terms.map(alternatives => ({
       $or: ['title','body','destination','state','category','place'].map(field => ({[field]: {$regex:alternatives.map(escape).join('|'),$options:'i'}})),
     }));
+    clauses.push(visible);
     if (category === 'Prices & Costs') clauses.push({$or:[{price:{$type:'number'}},{category}]});
     else if (category !== 'All experiences') clauses.push({category});
     const [posts,user] = await Promise.all([
       db.collection('posts').find(clauses.length ? {$and:clauses} : {}, {projection:{_id:0}}).sort({created:-1}).limit(60).toArray(),
       getCurrentUser(),
     ]);
-    return Response.json({posts:posts.map(({user_id,...post}) => ({...post,own:user_id===user?.userId})),limit:60}, {headers:{'Cache-Control':'private, no-store'}});
+    return Response.json({posts:await publicPosts(posts,user?.userId),limit:60}, {headers:{'Cache-Control':'private, no-store'}});
   } catch {
     return Response.json({error:'Search is temporarily unavailable. Please try again.'},{status:503});
   }

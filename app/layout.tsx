@@ -3,6 +3,7 @@ import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from './seo';
 import "./globals.css";
 import "./premium.css";
 import "./experiences.css";
+import "./member.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
