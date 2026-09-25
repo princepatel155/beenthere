@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "./scenery.css";
+import "./premium.css";
 
 export const metadata: Metadata = {
   title: "Kisse Safar Ke — Explore India through real experiences",
