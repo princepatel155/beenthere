@@ -3,11 +3,11 @@
 The same Google button creates an account on first login and signs into it afterward. The integration stays inactive until GOOGLE_CLIENT_ID is configured.
 
 ## Current setup
-Google Cloud project BeenThere (synthetic-hash-509710-s3) exists. Branding and the Google API Services User Data Policy are completed. Web OAuth client creation is paused until the final Netlify address is known. No Google billing or paid trial was enabled.
+Google Cloud project BeenThere (synthetic-hash-509710-s3) exists. Branding and the Google API Services User Data Policy are completed. The BeenThere Web client has been created with the production origin https://beenthere-india-prince.netlify.app and the local development origins below. Its public Client ID is 605254231625-9e7lhclmihsko6lkfl40fsm246rfffqm.apps.googleusercontent.com. It is configured in ignored .env.local and the Netlify production environment. No Google billing or paid trial was enabled.
 
-## Finish the client
+## Reference setup for additional domains
 1. Open https://console.cloud.google.com/auth/clients?project=synthetic-hash-509710-s3
-2. Create a Web application client named BeenThere Web.
+2. Edit the existing Web application client named BeenThere Web; do not create a duplicate.
 3. Add authorized JavaScript origins:
    - http://localhost
    - http://localhost:5173

@@ -10,7 +10,7 @@ Your existing Netlify team is on **Free Legacy**. Keep that exact plan. Do not s
 - Google login: Google Identity Services; only basic identity, with no client secret.
 
 ## Before deploying
-Your Desktop has local MongoDB/Compass. An online Atlas cluster named BeenThere is ACTIVE on the Free tier ($0/hour, 512 MB), in AWS Mumbai. Organization: Student; project: Project 0. No paid tier or billing details were selected. The beenthere_app database user has readWrite access limited to beenthere. Atlas authentication and application index creation succeeded. The local app now uses Atlas through the ignored .env.local file; its community API returned HTTP 200. Netlify still needs its own production environment variables. Netlify cannot reach mongodb://127.0.0.1:27017 on your computer.
+Your Desktop has local MongoDB/Compass. An online Atlas cluster named BeenThere is ACTIVE on the Free tier ($0/hour, 512 MB), in AWS Mumbai. Organization: Student; project: Project 0. No paid tier or billing details were selected. The beenthere_app database user has readWrite access limited to beenthere. Atlas authentication and application index creation succeeded. The local app now uses Atlas through the ignored .env.local file; its community API returned HTTP 200. Netlify production variables have been saved as secrets, restricted to the production context. Netlify cannot reach mongodb://127.0.0.1:27017 on your computer.
 
 Use the existing **BeenThere MongoDB Atlas Free (M0)** cluster for production: https://cloud.mongodb.com/v2/6ab659b302812f284ac40d29#/overview . Atlas Free is a limited shared database, not unlimited storage. Do not select Flex, Dedicated, or a paid tier. Set an application database named beenthere, so existing project data stays separate. Use a database user limited to that database. Keep the connection string private.
 
@@ -42,7 +42,7 @@ MongoDB collections and indexes initialize on the first database request. No SQL
 ## Google sign-in
 After Netlify assigns a stable https://YOUR-SITE.netlify.app address, add that exact origin to the BeenThere web OAuth client in Google Cloud. No path or trailing slash. Add your custom domain too if you later use one.
 
-Google project: BeenThere (synthetic-hash-509710-s3). Branding and the data policy are completed. OAuth client creation was paused for the Netlify move; a real Client ID and final Netlify origin still need to be configured.
+Google project: BeenThere (synthetic-hash-509710-s3). Branding and the data policy are completed. The BeenThere Web client and its Netlify origin are configured; see GOOGLE_AUTH_SETUP.md.
 
 See GOOGLE_AUTH_SETUP.md. Google can block sign-in in embedded browsers; test in a normal browser.
 
@@ -68,3 +68,8 @@ npm run build verifies the production Next.js output.
 - https://docs.netlify.com/build/data-and-storage/netlify-blobs/
 - https://www.mongodb.com/docs/atlas/tutorial/deploy-free-tier-cluster/
 - https://www.mongodb.com/pricing
+
+## Deployment identity
+Private source repository: https://github.com/princepatel155/beenthere
+Netlify project: beenthere-india-prince (89ecff38-d35e-411c-b89e-701c4f06cb27). The displayed website name remains BeenThere. Netlify rejected beenthere.netlify.app because that project name is already taken.
+The deployment checkout is .local/netlify-source, with its own Git history and no private environment files. Keep source changes synchronized from this workspace before committing there.
