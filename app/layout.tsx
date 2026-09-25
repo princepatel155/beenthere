@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./scenery.css";
 
 export const metadata: Metadata = {
   title: "Kisse Safar Ke — Explore India through real experiences",
@@ -19,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">{children}</body>
+    <html lang="en" data-scroll-behavior="smooth">
+      <body id="top" className="antialiased"><div className="travel-backdrop" aria-hidden="true" />{children}</body>
     </html>
   );
 }

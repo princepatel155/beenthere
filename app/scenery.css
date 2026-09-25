@@ -1,0 +1,62 @@
+/* Native scrolling keeps touch, keyboard and browser navigation intact. */
+html { scroll-behavior: smooth; scroll-padding-top: 104px; }
+body { position: relative; isolation: isolate; background: #e6f1ee; }
+.travel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(#f3fbff26, #f4f8ed38), url('/images/himalayan-journey.webp') center center / cover no-repeat;
+}
+.sidebar { background: #fcfdf7eb; border-color: #ffffff80; }
+.topbar { background: #f8fcf4e6; border-color: #ffffff80; }
+.main-shell main { background: #f8faf4ed; padding-bottom: 24px; }
+.discovery-shell .main-shell main { background: transparent; }
+.discovery-hero { min-height: 510px; display: flex; flex-direction: column; justify-content: center; padding: 24px 0 20px; }
+.discovery-hero .page-intro { margin-bottom: 38px; }
+.discovery-hero h1 { color: #153d3c; font-size: clamp(38px, 4.1vw, 62px); text-shadow: 0 2px 22px #ffffffb3; }
+.discovery-hero h1 em { color: #17614e; }
+.discovery-hero .eyebrow { color: #294e45; }
+.discovery-hero .page-intro p { color: #254c43; background: #fcfff5d9; padding: 9px 13px; border-radius: 8px; width: fit-content; }
+.discovery-hero .travel-stamp { background: #f7fbedcc; color: #315b4b; border-color: #315b4b; flex-shrink: 0; }
+.discovery-hero .search-bar { background: #ffffffed; box-shadow: 0 8px 32px #1a42311a; }
+.discovery-hero .theme-filters { margin-bottom: 0; }
+.discovery-hero .theme-filters button { background: #fffef5ed; color: #365d4d; }
+.discovery-hero .theme-filters button.selected { background: #176c56; color: white; border-color: #176c56; }
+.discovery-shell #destinations, .discovery-shell .feed-layout {
+  background: #fafcf6f2;
+  border: 1px solid #ffffffbd;
+  border-radius: 18px;
+  padding: 26px;
+  box-shadow: 0 12px 40px #1e453414;
+}
+#destinations { scroll-margin-top: 20px; }
+.discovery-shell footer { background: #fafcf6f2; padding: 22px; border-radius: 12px; }
+footer .back-to-top { margin-left: auto; color: #245941; font-size: 12px; font-weight: 600; white-space: nowrap; }
+footer .back-to-top + button { margin-left: 6px; }
+.login-shell { background: transparent; }
+.login-shell > .brand { padding: 14px 22px; background: #fcfff3eb; border: 1px solid #ffffffbf; border-radius: 16px; box-shadow: 0 6px 28px #214b3514; }
+.login-card { background: #fffffff2; border-color: #ffffffd9; box-shadow: 0 20px 65px #153f3b29; }
+.login-shell > .back-link { background: #fcfff3ed; color: #24543e; padding: 10px 18px; border-radius: 24px; }
+@media (min-width: 761px) {
+  .sidebar, .topbar { backdrop-filter: blur(12px); }
+}
+@media (max-width: 1000px) {
+  .discovery-hero .travel-stamp { display: none; }
+  .discovery-shell #destinations, .discovery-shell .feed-layout { padding: 20px; }
+}
+@media (max-width: 760px) {
+  html { scroll-padding-top: 80px; }
+  .travel-backdrop { background-position: 58% center; }
+  .discovery-hero { min-height: 490px; padding-top: 18px; }
+  .discovery-hero h1 { font-size: clamp(36px, 9vw, 48px); }
+  .discovery-hero .page-intro p { font-size: 13px; }
+  .discovery-shell #destinations, .discovery-shell .feed-layout { padding: 18px 14px; border-radius: 14px; }
+  .discovery-shell .feed-layout { gap: 22px; }
+  .login-shell { padding-top: 26px; padding-bottom: 26px; }
+  footer > span { flex-basis: 100%; order: 3; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
