@@ -16,7 +16,7 @@ export default function GoogleLogin(){
  useEffect(()=>{let cancelled=false;
   async function init(){try{const r=await fetch('/api/auth/google',{cache:'no-store'});const config:any=await r.json();if(cancelled)return;if(!r.ok)throw Error(config.error);if(!config.configured){setStatus('unconfigured');return;}
    await loadGoogle();if(cancelled||!button.current||!window.google)return;
-   window.google.accounts.id.initialize({client_id:config.clientId,nonce:config.nonce,auto_select:false,use_fedcm_for_button:true,context:'signin',ux_mode:'popup',callback:async(result:{credential:string})=>{setStatus('saving');setError('');try{
+   window.google.accounts.id.initialize({client_id:config.clientId,nonce:config.nonce,auto_select:false,use_fedcm_for_button:false,context:'signin',ux_mode:'popup',callback:async(result:{credential:string})=>{setStatus('saving');setError('');try{
     const response=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:result.credential})});
     const body:any=await response.json();if(!response.ok)throw Error(body.error);
     const value=new URLSearchParams(window.location.search).get('returnTo')||'/profile';
