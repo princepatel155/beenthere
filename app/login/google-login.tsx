@@ -26,11 +26,11 @@ export default function GoogleLogin(){
   }catch(e:any){if(!cancelled){setError(e.message);setStatus('error');}}}
   init();return()=>{cancelled=true;};
  },[]);
- return <main className="login-shell"><Link href="/" className="brand"><span className="brand-icon"><MapPin size={28}/></span>been<span>there</span><span className="brand-dot">.</span></Link><div className="login-card"><div className="eyebrow">EVERY JOURNEY STARTS SOMEWHERE</div><h1>A familiar face.<br/>A whole new journey.</h1><p className="login-intro">Sign in or create your free BeenThere account.</p>
+ return <main className="login-shell"><Link href="/" className="brand" aria-label="Kisse Safar Ke home"><span className="brand-icon"><MapPin size={28}/></span><span className="brand-name"><strong>Kisse</strong><span>Safar Ke</span></span></Link><div className="login-card"><div className="eyebrow">EVERY JOURNEY STARTS SOMEWHERE</div><h1>A familiar face.<br/>A whole new journey.</h1><p className="login-intro">Sign in or create your free Kisse Safar Ke account.</p>
  <div ref={button} className={'google-button-slot '+(status==='saving'?'disabled-google':'')}/>
  {status==='loading'&&<p role="status" className="muted">Getting Google sign-in ready…</p>}
  {status==='saving'&&<p role="status" className="muted">Signing you in securely…</p>}
- {status==='unconfigured'&&<><button className="google-unavailable" disabled><span>G</span>Continue with Google</button><p className="login-setup" role="status">Google sign-in is coming soon. You can explore BeenThere while the site owner completes setup.</p></>}
+ {status==='unconfigured'&&<><button className="google-unavailable" disabled><span>G</span>Continue with Google</button><p className="login-setup" role="status">Google sign-in is coming soon. You can explore Kisse Safar Ke while the site owner completes setup.</p></>}
  {status==='error'&&<div className="login-error" role="alert"><p>{error}</p><button className="outline" onClick={()=>window.location.reload()}>Try again</button></div>}
  <p className="login-account-note">New here? Your first Google sign-in creates your account automatically.</p><div className="login-benefits"><span><Bookmark size={18}/>Save ideas for your next trip</span><span><PenLine size={18}/>Share your own experiences</span><span><ShieldCheck size={18}/>No new password to remember</span></div><p className="login-privacy">Google shares your account identifier, name, and email to create and protect your account. Your email is never shown on public reviews.</p></div><Link className="back-link" href="/"><ArrowLeft size={15}/>Keep exploring India</Link></main>;
 }

@@ -1,4 +1,4 @@
-# BeenThere on Netlify Free Legacy
+# Kisse Safar Ke on Netlify Free Legacy
 
 Your existing Netlify team is on **Free Legacy**. Keep that exact plan. Do not select a credit-plan migration, paid add-on, AI Agent Runner, paid database, or paid upgrade. No account plan or payment settings were changed during this migration.
 
@@ -71,7 +71,7 @@ npm run build verifies the production Next.js output.
 
 ## Deployment identity
 Private source repository: https://github.com/princepatel155/beenthere
-Netlify project: beenthere-india-prince (89ecff38-d35e-411c-b89e-701c4f06cb27). The displayed website name remains BeenThere. Netlify rejected beenthere.netlify.app because that project name is already taken.
+Netlify project: beenthere-india-prince (89ecff38-d35e-411c-b89e-701c4f06cb27). The approved public website name is Kisse Safar Ke. The existing Netlify URL remains in use. Database, storage and repository identifiers retain their original names to preserve existing data and integrations.
 The deployment checkout is .local/netlify-source, with its own Git history and no private environment files. Keep source changes synchronized from this workspace before committing there.
 
 ## Production verification (2026-09-25)

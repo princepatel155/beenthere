@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "BeenThere — Explore India through real experiences",
+  title: "Kisse Safar Ke — Explore India through real experiences",
   description: "Discover destinations across India, share travel reviews and photos, and save ideas for your next trip.",
   other: {
     "codex-preview": "development",

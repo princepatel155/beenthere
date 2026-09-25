@@ -3,6 +3,8 @@
 The same Google button creates an account on first login and signs into it afterward. The integration stays inactive until GOOGLE_CLIENT_ID is configured.
 
 ## Current setup
+The public OAuth consent-screen app name was updated to Kisse Safar Ke on 2026-09-25. The existing Google Cloud project and OAuth client retain their internal names and identifiers; authorized origins and permissions are unchanged.
+
 Google Cloud project BeenThere (synthetic-hash-509710-s3) exists. Branding and the Google API Services User Data Policy are completed. The BeenThere Web client has been created with the production origin https://beenthere-india-prince.netlify.app and the local development origins below. Its public Client ID is 605254231625-9e7lhclmihsko6lkfl40fsm246rfffqm.apps.googleusercontent.com. It is configured in ignored .env.local and the Netlify production environment. No Google billing or paid trial was enabled.
 
 ## Reference setup for additional domains
