@@ -2,3 +2,5 @@
 @media(max-width:760px){.member-card{padding:20px 16px}.profile-heading{gap:14px;align-items:flex-start}.profile-photo{width:62px;height:62px}.profile-heading h1{font-size:31px}.profile-heading h2{font-size:25px}.trip-create{flex-wrap:wrap}.trip-create label{flex-basis:100%}.member-actions{gap:15px}.saved-place{flex-wrap:wrap}.member-card .profile-stats{gap:15px}.member-card .section-heading h2{font-size:25px}.moderation-queue>h1{font-size:32px}.member-form .form-row{grid-template-columns:1fr}}
 
 .moderation-photo{display:inline-block;width:140px;height:110px;object-fit:cover;margin:15px 10px 0 0;border-radius:8px}
+
+.sign-out-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:8px 12px;border:1px solid #aabd9160;border-radius:24px;background:transparent;color:#e1e7cb;font-size:12px;white-space:nowrap}.sign-out-button:hover{background:#ffffff0d}.sidebar-sign-out{width:100%;margin-top:14px}.profile-stats .sign-out-button{flex-shrink:0}@media(max-width:760px){.top-actions{gap:10px}.header-sign-out{padding:7px 9px;font-size:11px;gap:5px}.header-sign-out svg{display:none}}

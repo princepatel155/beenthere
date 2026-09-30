@@ -144,9 +144,25 @@ test('MongoDB-backed website: ownership, photos, votes, saves, sessions and logi
   assert.equal(attempts.filter(Boolean).length,1,'nonce redemption must be atomic');
   await db.collection('sessions').updateOne({token_hash:hash(other)},{$set:{expires:new Date(0)}});
   assert.equal((await call('/api/community',{action:'save',postId,enabled:true},other)).status,401);
-  assert.equal((await call('/api/auth/logout',{})).status,200);
+  const loggedInPage=await fetch(origin+'/explore',{headers:{Cookie:'bt_session='+token}});
+  const loggedInHtml=await loggedInPage.text();
+  assert(loggedInHtml.includes('header-sign-out'),'Sign out is available outside the profile');
+  assert(loggedInHtml.includes('sidebar-sign-out'),'The mobile menu includes sign out');
+  const blockedLogout=await fetch(origin+'/api/auth/logout',{method:'POST',headers:{Origin:'https://bad.test',Cookie:'bt_session='+token}});
+  assert.equal(blockedLogout.status,403);assert.equal(blockedLogout.headers.get('set-cookie'),null);
+  assert.equal(await db.collection('sessions').countDocuments({token_hash:hash(token)}),1);
+  const logout=await call('/api/auth/logout',{});assert.equal(logout.status,200);
+  assert.equal((await logout.json()).signedOut,true);
+  const expiredCookies=logout.headers.getSetCookie();
+  assert(expiredCookies.some(c=>c.startsWith('bt_session=;')&&c.includes('Max-Age=0')&&c.includes('HttpOnly')));
+  assert(expiredCookies.some(c=>c.startsWith('bt_google_nonce=;')&&c.includes('Max-Age=0')));
   assert.equal((await call('/api/community',{action:'save',postId,enabled:true})).status,401);
   assert.equal(await db.collection('sessions').countDocuments({token_hash:hash(token)}),0);
+  assert.equal((await call('/api/auth/logout',{})).status,200,'Repeated logout is safe');
+  assert.equal((await call('/api/auth/logout',{},null)).status,200,'Already signed-out visitors can finish logout');
+  assert.equal((await fetch(origin+'/api/auth/logout')).status,405,'GET must not log users out');
+  const signedOutHtml=await (await fetch(origin+'/explore',{headers:{Cookie:'bt_session='+token}})).text();
+  assert(!signedOutHtml.includes('class="sign-out-button header-sign-out"'),'Revoked sessions render the signed-out navigation');
  }finally{
   if(child?.pid){if(process.platform==='win32')spawnSync('taskkill',['/pid',String(child.pid),'/T','/F'],{stdio:'ignore',windowsHide:true});else child.kill('SIGTERM');}
   for(const id of photos)if(/^[a-f0-9-]{36}$/.test(id))await unlink(path.join('.local','photos',id)).catch(()=>{});
