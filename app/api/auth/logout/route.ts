@@ -1,5 +1,6 @@
+import {monitored} from '../../../monitoring/server';
 import { database,hashToken,requestCookie,sameOrigin,cookieValue,SESSION_COOKIE,NONCE_COOKIE } from '../../../auth/session';
-export async function POST(request:Request){
+async function handlePOST(request:Request){
  if(!sameOrigin(request))return Response.json({error:'Invalid origin'},{status:403});
  const secure=new URL(request.url).protocol==='https:';
  const headers=new Headers({'Cache-Control':'private, no-store'});
@@ -15,3 +16,5 @@ export async function POST(request:Request){
   return Response.json({signedOut:true,error:'Signed out on this browser. Server session revocation could not be completed.'},{status:503,headers});
  }
 }
+
+export const POST=monitored('/api/auth/logout',handlePOST);

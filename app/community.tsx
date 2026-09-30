@@ -1,4 +1,5 @@
 "use client";
+import {track} from './monitoring/analytics-client';
 import { useState,useEffect,useCallback } from 'react';
 import { usePathname,useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -48,16 +49,16 @@ export default function Community({user,signInPath,routeDestination}:{user:User;
  },[detailId]);
  useEffect(()=>{refresh();},[refresh]);
  useEffect(()=>{setMenu(false);setQuery('');setCategory('All experiences');setState('All India');setTheme('All places');},[path]);
- async function mutate(body:unknown){const r=await fetch('/api/community',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j:any=await r.json();if(!r.ok)throw Error(j.error);await refresh();return j;}
+ async function mutate(body:unknown){const r=await fetch('/api/community',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j:any=await r.json();if(!r.ok)throw Error(j.error);const action=body as {action:string;kind?:string;enabled?:boolean};if(action.action==='vote'&&action.kind==='helpful'&&action.enabled)track('helpful_clicked');if(action.action==='save'&&action.enabled)track('save_place');await refresh();return j;}
  function signed(){if(user)return true;toast('Sign in to share experiences and save trips.',{action:{label:'Sign in',onClick:()=>window.location.assign(signInPath)}});return false;}
- function openWrite(type='review',topic?:string){setMenu(false);setKind(type);if(topic)setPostCategory(topic);if(selectedName){setDestination(selectedName);setPostState(selectedDestination?.state||'');}setWrite(true);}
+ function openWrite(type='review',topic?:string){track('review_started');setMenu(false);setKind(type);if(topic)setPostCategory(topic);if(selectedName){setDestination(selectedName);setPostState(selectedDestination?.state||'');}setWrite(true);}
  async function vote(p:Post,v:string){if(!signed()||busy)return;setBusy(true);try{const enabled=!data.ownVotes.some(x=>x.post_id===p.id&&x.kind===v);await mutate({action:'vote',postId:p.id,kind:v,enabled});}catch(e:any){toast.error(e.message);}finally{setBusy(false);}}
  async function save(p:Post){if(!signed())return;setSavePost(p);setCollection(data.saves.find(s=>s.post_id===p.id)?.collection||'My next trip');try{const r=await fetch('/api/member');const j=await r.json() as {trips:{name:string}[]};if(r.ok)setTripNames(j.trips.map(t=>t.name));}catch{toast.error('Could not load existing trips. You can still enter a trip name.');}}
  async function saveSubmit(enabled=true){if(!savePost||busy)return;setBusy(true);try{await mutate({action:'save',postId:savePost.id,collection,enabled});setSavePost(null);toast.success(enabled?'Saved to your trip.':'Removed from your trip.');}catch(e:any){toast.error(e.message);}finally{setBusy(false);}}
  async function publish(e:React.FormEvent<HTMLFormElement>){e.preventDefault();if(!signed()||busy)return;const form=new FormData(e.currentTarget);if(!rating||!postState){setFormError('Choose a state and a rating.');return;}setBusy(true);setFormError('');try{
-  const photos:string[]=[];for(const file of files){const f=new FormData();f.set('file',file);const r=await fetch('/api/photos',{method:'POST',body:f});const j:any=await r.json();if(!r.ok)throw Error(j.error);photos.push(j.id);}
+  const photos:string[]=[];for(const file of files){const f=new FormData();f.set('file',file);const r=await fetch('/api/photos',{method:'POST',body:f});const j:any=await r.json();if(!r.ok)throw Error(j.error);photos.push(j.id);track('photo_uploaded');}
   const j=await mutate({action:'post',kind,author,destination,state:postState,category:postCategory,rating,tripType,photos,photoDetails:photos.map((id,i)=>({id,...photoDrafts[i]})),place:form.get('place'),costBasis:form.get('costBasis'),tripDays:form.get('tripDays'),title:form.get('title'),body:form.get('body'),price:form.get('price'),visited:form.get('visited')});
-  setWrite(false);setFiles([]);setPhotoDrafts([]);setRating(0);router.push('/experience/'+j.id);toast.success('Your experience is published.');
+  track('review_submitted');setWrite(false);setFiles([]);setPhotoDrafts([]);setRating(0);router.push('/experience/'+j.id);toast.success('Your experience is published.');
  }catch(e:any){setFormError(e.message);}finally{setBusy(false);}}
  const searching=!!query.trim()||category!=='All experiences';
  const filteredDestinations=allDestinations.filter(d=>(theme==='All places'||d.type===theme)&&(state==='All India'||d.state===state)&&matchesSearch(d.name+' '+d.state,query));

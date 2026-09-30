@@ -4,6 +4,8 @@ import "./globals.css";
 import "./premium.css";
 import "./experiences.css";
 import "./member.css";
+import "./monitoring/monitoring.css";
+import Analytics from './monitoring/analytics-client';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -24,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body id="top" className="antialiased"><div className="travel-backdrop" aria-hidden="true" />{children}</body>
+      <body id="top" className="antialiased"><div className="travel-backdrop" aria-hidden="true" />{children}<Analytics/></body>
     </html>
   );
 }

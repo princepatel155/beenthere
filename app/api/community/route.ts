@@ -1,3 +1,4 @@
+import {monitored} from '../../monitoring/server';
 import { visible,publicPosts,migrateSaves,ensureTrip,catalogEntry } from '../../product-server';
 import { database } from '../../../db';
 import { getCurrentUser, sameOrigin } from '../../auth/session';
@@ -5,7 +6,7 @@ import { states, reviewCategories, samplePosts } from '../../data';
 import { costBases, photoTopics } from '../../experience-utils';
 const json=(data:unknown,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'private, no-store'}});
 const clean=(v:unknown,max:number)=>typeof v==='string'?v.trim().slice(0,max):'';
-export async function GET(request:Request){
+async function handleGET(request:Request){
  try {
   const user=await getCurrentUser(), d=await database();
   const destination=(new URL(request.url).searchParams.get('destination')||'').trim().slice(0,100);
@@ -26,7 +27,7 @@ export async function GET(request:Request){
   return json({posts:await publicPosts(posts,user?.userId),votes:votes.filter(v=>visibleIds.includes(v.post_id)),saves,comments:comments.filter(c=>visibleIds.includes(c.post_id)),ownVotes});
  }catch{return json({error:'Community data is temporarily unavailable. Please try again.'},503);}
 }
-export async function POST(request:Request){
+async function handlePOST(request:Request){
  try{
   if(!sameOrigin(request))return json({error:'Invalid request origin.'},403);
   const user=await getCurrentUser();if(!user)return json({error:'Sign in to contribute or save a trip.'},401);
@@ -59,7 +60,7 @@ export async function POST(request:Request){
   if(!samplePosts.some(p=>p.id===postId)&&!actualPost)return json({error:'This experience could not be found.'},404);
   if(b.action==='vote'&&['helpful','accurate','outdated'].includes(b.kind)){
    const filter={post_id:postId,user_id:user.userId,kind:b.kind};
-   if(b.enabled)await d.collection('votes').updateOne(filter,{$setOnInsert:filter},{upsert:true});
+   if(b.enabled)await d.collection('votes').updateOne(filter,{$setOnInsert:{...filter,created:new Date().toISOString()}},{upsert:true});
    else await d.collection('votes').deleteOne(filter);
    return json({ok:true});
   }
@@ -85,3 +86,6 @@ export async function POST(request:Request){
   return json({error:'Unknown action.'},400);
  }catch{return json({error:'Your changes could not be saved. Please try again.'},503);}
 }
+
+export const GET=monitored('/api/community',handleGET);
+export const POST=monitored('/api/community',handlePOST);

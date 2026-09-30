@@ -1,3 +1,5 @@
+import {isOwner} from '../../monitoring/privacy';
+import {monitored} from '../../monitoring/server';
 import { database } from '../../../db';
 import { getCurrentUser,sameOrigin } from '../../auth/session';
 import { publicProfile,publicPosts,visible,moderator,migrateSaves,ensureTrip,catalogEntry } from '../../product-server';
@@ -6,7 +8,7 @@ import { destinations,states } from '../../data';
 const json=(data:unknown,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'private, no-store'}});
 const clean=(v:unknown,n:number)=>typeof v==='string'?v.trim().slice(0,n):'';
 const reasons=['Spam or advertising','Harassment or hate','False or misleading information','Private information','Inappropriate photo','Other'];
-export async function GET(request:Request){
+async function handleGET(request:Request){
  try{
   const db=await database(),user=await getCurrentUser(),params=new URL(request.url).searchParams;
   const username=params.get('username');
@@ -27,10 +29,10 @@ export async function GET(request:Request){
   }
   await migrateSaves(user.userId);
   const [account,trips,items]=await Promise.all([db.collection('accounts').findOne({id:user.userId}),db.collection('trips').find({user_id:user.userId},{projection:{_id:0,user_id:0,key:0}}).sort({created:-1}).toArray(),db.collection('trip_items').find({user_id:user.userId},{projection:{_id:0,user_id:0}}).toArray()]);
-  return json({profile:publicProfile(account!),trips,items,canModerate});
+  return json({profile:publicProfile(account!),trips,items,canModerate,canMonitor:isOwner(user.email)});
  }catch{return json({error:'Unable to load your account. Please try again.'},503);}
 }
-export async function POST(request:Request){
+async function handlePOST(request:Request){
  try{
   if(!sameOrigin(request))return json({error:'Invalid request origin.'},403);
   const user=await getCurrentUser();if(!user)return json({error:'Please sign in first.'},401);
@@ -101,3 +103,6 @@ export async function POST(request:Request){
   return json({error:'Unknown action.'},400);
  }catch(error){if((error as {code?:number}).code===11000)return json({error:'That username or trip name is already in use. Choose another.'},409);return json({error:'Your changes could not be saved. Please try again.'},503);}
 }
+
+export const GET=monitored('/api/member',handleGET);
+export const POST=monitored('/api/member',handlePOST);

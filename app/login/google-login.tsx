@@ -1,4 +1,5 @@
 "use client";
+import {track,flush} from '../monitoring/analytics-client';
 import { useEffect,useRef,useState } from 'react';
 import Link from 'next/link';
 import { MapPin,Bookmark,PenLine,ArrowLeft,ShieldCheck } from 'lucide-react';
@@ -19,10 +20,11 @@ export default function GoogleLogin(){
    window.google.accounts.id.initialize({client_id:config.clientId,nonce:config.nonce,auto_select:false,use_fedcm_for_button:false,context:'signin',ux_mode:'popup',callback:async(result:{credential:string})=>{setStatus('saving');setError('');try{
     const response=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:result.credential})});
     const body:any=await response.json();if(!response.ok)throw Error(body.error);
+    if(body.isNewUser){track('signup_completed');flush();}
     const value=new URLSearchParams(window.location.search).get('returnTo')||'/profile';
     const next=new URL(value,window.location.origin);window.location.assign(next.origin===window.location.origin?next.pathname+next.search:'/profile');
    }catch(e:any){setError(e.message||'Sign-in failed. Please try again.');setStatus('error');}}});
-   window.google.accounts.id.renderButton(button.current,{type:'standard',theme:'outline',size:'large',text:'continue_with',shape:'rectangular',width:300,logo_alignment:'left'});setStatus('ready');
+   window.google.accounts.id.renderButton(button.current,{type:'standard',theme:'outline',size:'large',text:'continue_with',shape:'rectangular',width:300,logo_alignment:'left',click_listener:()=>track('signup_started')});setStatus('ready');
   }catch(e:any){if(!cancelled){setError(e.message);setStatus('error');}}}
   init();return()=>{cancelled=true;};
  },[]);

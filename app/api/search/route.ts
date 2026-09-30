@@ -1,3 +1,4 @@
+import {monitored} from '../../monitoring/server';
 import { visible,publicPosts } from '../../product-server';
 import { database } from '../../../db';
 import { getCurrentUser } from '../../auth/session';
@@ -5,7 +6,7 @@ import { searchTerms } from '../../experience-utils';
 import { reviewCategories } from '../../data';
 
 const escape = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-export async function GET(request: Request) {
+async function handleGET(request: Request) {
   const params = new URL(request.url).searchParams;
   const query = (params.get('q') || '').trim().slice(0, 160);
   const category = params.get('category') || 'All experiences';
@@ -29,3 +30,5 @@ export async function GET(request: Request) {
     return Response.json({error:'Search is temporarily unavailable. Please try again.'},{status:503});
   }
 }
+
+export const GET=monitored('/api/search',handleGET);

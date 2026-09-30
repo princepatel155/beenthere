@@ -1,8 +1,9 @@
+import {monitored} from '../../../monitoring/server';
 import { visible,moderator } from '../../../product-server';
 import { database } from '../../../../db';
 import { photoStore } from '../../../storage';
 import { getCurrentUser } from '../../../auth/session';
-export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}){
+async function handleGET(_request:Request,{params}:{params:Promise<{id:string}>}){
  try{
   const {id}=await params;
   if(!/^[a-f0-9-]{36}$/.test(id))return new Response('Not found',{status:404});
@@ -16,3 +17,4 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
   return new Response(object,{headers:{'Content-Type':metadata.mime,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}});
  }catch{return new Response('Photo unavailable',{status:503});}
 }
+export const GET=monitored('/api/photos/:id',handleGET);

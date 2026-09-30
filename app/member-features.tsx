@@ -1,4 +1,5 @@
 'use client';
+import {track} from './monitoring/analytics-client';
 import {useState,useEffect,useCallback,type ReactNode} from 'react';
 import Link from 'next/link';
 import {Bookmark,Flag,Plus,Camera,ShieldCheck} from 'lucide-react';
@@ -10,12 +11,12 @@ import {destinationPath} from './catalog';
 
 export async function memberAction(body:unknown){
  const response=await fetch('/api/member',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
- const data=await response.json() as {error?:string;id:string};if(!response.ok)throw Error(data.error||'Please try again.');return data;
+ const data=await response.json() as {error?:string;id:string};if(!response.ok)throw Error(data.error||'Please try again.');const action=(body as {action?:string}).action;if(action==='trip-create')track('trip_created');if(action==='trip-add'||action==='destination-save')track('save_place');return data;
 }
 type Profile={name:string;username:string;bio:string;photo:string|null;joined:string|null};
 type Trip={id:string;name:string};
 type Item={trip_id:string;kind:string;target_id:string;label?:string};
-type Member={profile:Profile;trips:Trip[];items:Item[];canModerate:boolean};
+type Member={profile:Profile;trips:Trip[];items:Item[];canModerate:boolean;canMonitor:boolean};
 function useMember(){
  const [data,setData]=useState<Member|null>(null),[error,setError]=useState('');
  const reload=useCallback(async()=>{try{const r=await fetch('/api/member');const j=await r.json() as Member & {error:string};if(!r.ok)throw Error(j.error);setData(j);setError('');}catch(e){setError(e instanceof Error?e.message:'Please try again.');}},[]);
@@ -25,7 +26,7 @@ export function ProfileEditor(){
  const {data,error,reload}=useMember();const [busy,setBusy]=useState(false),[editing,setEditing]=useState(false),[file,setFile]=useState<File|null>(null),[removePhoto,setRemovePhoto]=useState(false);
  if(!data)return <p role="status">{error||'Loading your profile…'}</p>;
  const p=data.profile;
- return <section className="member-card"><div className="profile-heading">{p.photo?<img className="profile-photo" src={photoUrl(p.photo)} alt={p.name}/>:<span className="profile-photo initials">{p.name.slice(0,1)}</span>}<div><h2>{p.name}</h2><p>{p.username?'@'+p.username:'Choose your traveler username'}</p><p>{p.bio}</p></div></div><div className="member-actions"><button className="outline" onClick={()=>setEditing(!editing)}>{editing?'Close editor':'Edit profile'}</button>{p.username&&<Link className="text-link" href={'/travelers/'+p.username}>View public profile</Link>}<Link className="text-link" href="/saved">My private trips</Link>{data.canModerate&&<Link className="text-link" href="/moderation"><ShieldCheck size={16}/>Review reports</Link>}</div>
+ return <section className="member-card"><div className="profile-heading">{p.photo?<img className="profile-photo" src={photoUrl(p.photo)} alt={p.name}/>:<span className="profile-photo initials">{p.name.slice(0,1)}</span>}<div><h2>{p.name}</h2><p>{p.username?'@'+p.username:'Choose your traveler username'}</p><p>{p.bio}</p></div></div><div className="member-actions"><button className="outline" onClick={()=>setEditing(!editing)}>{editing?'Close editor':'Edit profile'}</button>{p.username&&<Link className="text-link" href={'/travelers/'+p.username}>View public profile</Link>}<Link className="text-link" href="/saved">My private trips</Link>{data.canModerate&&<Link className="text-link" href="/moderation"><ShieldCheck size={16}/>Review reports</Link>}{data.canMonitor&&<Link className="text-link" href="/admin">Site monitoring</Link>}</div>
  {editing&&<form className="member-form" onSubmit={async e=>{e.preventDefault();if(busy)return;const form=new FormData(e.currentTarget);setBusy(true);try{let photo=removePhoto?null:p.photo;if(file){const payload=new FormData();payload.set('file',file);const r=await fetch('/api/photos',{method:'POST',body:payload});const j=await r.json() as {id:string;error:string};if(!r.ok)throw Error(j.error);photo=j.id;}await memberAction({action:'profile',name:form.get('name'),username:form.get('username'),bio:form.get('bio'),photo});await reload();setEditing(false);setFile(null);toast.success('Profile saved.');}catch(e){toast.error((e as Error).message);}finally{setBusy(false);}}}>
  <div className="form-row"><label>Display name<input name="name" required minLength={2} maxLength={60} defaultValue={p.name}/></label><label>Username<input name="username" required pattern="[a-zA-Z][a-zA-Z0-9_]{2,29}" maxLength={30} defaultValue={p.username} placeholder="your_travel_name"/></label></div><label>About you<textarea name="bio" rows={3} maxLength={300} defaultValue={p.bio}/></label><label><Camera size={16}/>Profile photo · JPG, PNG or WebP, up to 3 MB<input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>{const f=e.target.files?.[0]||null;if(f&&f.size>3*1024*1024){toast.error('Choose a photo under 3 MB.');e.target.value='';return;}setFile(f);setRemovePhoto(false);}}/></label>{p.photo&&<label className="check-row"><input type="checkbox" checked={removePhoto} onChange={e=>{setRemovePhoto(e.target.checked);setFile(null);}}/>Remove current profile photo</label>}<p className="muted">Your name, username, bio, photo and contributions are public. Your email and saved trips stay private.</p><button className="primary" disabled={busy}>{busy?'Saving…':'Save profile'}</button></form>}
  </section>;

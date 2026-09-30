@@ -1,7 +1,8 @@
+import {monitored} from '../../../monitoring/server';
 import { googleClientId,database,randomToken,hashToken,cookieValue,sameOrigin,requestCookie,SESSION_COOKIE,NONCE_COOKIE,SESSION_SECONDS } from '../../../auth/session';
 import { verifyGoogleCredential } from '../../../auth/verify-google';
 const fail=(error:string,status:number)=>Response.json({error},{status,headers:{'Cache-Control':'no-store'}});
-export async function GET(request:Request){
+async function handleGET(request:Request){
  const clientId=googleClientId();if(!clientId)return Response.json({configured:false},{headers:{'Cache-Control':'no-store'}});
  const nonce=randomToken();
  try{
@@ -10,7 +11,7 @@ export async function GET(request:Request){
   return Response.json({configured:true,clientId,nonce},{headers:{'Cache-Control':'no-store','Set-Cookie':cookieValue(NONCE_COOKIE,nonce,600,new URL(request.url).protocol==='https:')}});
  }catch{ return fail('Sign-in is temporarily unavailable. Please try again.',503); }
 }
-export async function POST(request:Request){
+async function handlePOST(request:Request){
  if(!sameOrigin(request))return fail('Please start sign-in from this website.',403);
  if(!googleClientId())return fail('Google sign-in has not been configured yet.',503);
  let body:any;try{body=await request.json();}catch{return fail('Invalid sign-in request.',400);}
@@ -35,3 +36,6 @@ export async function POST(request:Request){
   return Response.json({ok:true,isNewUser:account.upsertedCount===1},{headers});
  }catch{return fail('Your account could not be saved. Reload the page and try again.',503);}
 }
+
+export const GET=monitored('/api/auth/google',handleGET);
+export const POST=monitored('/api/auth/google',handlePOST);

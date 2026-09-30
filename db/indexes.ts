@@ -2,6 +2,15 @@ import type { Db } from 'mongodb';
 
 export async function ensureIndexes(db: Db) {
   await Promise.all([
+    db.collection('monitor_events').createIndex({id:1},{unique:true}),
+    db.collection('monitor_events').createIndex({created:1,name:1}),
+    db.collection('monitor_api').createIndex({hour:1,key:1},{unique:true}),
+    db.collection('monitor_api').createIndex({created:1}),
+    db.collection('monitor_budget').createIndex({key:1},{unique:true}),
+    db.collection('monitor_ack').createIndex({key:1},{unique:true}),
+    db.collection('monitor_tasks').createIndex({key:1},{unique:true}),
+    db.collection('monitor_checks').createIndex({created:-1}),
+    ...['monitor_events','monitor_api','monitor_checks','monitor_budget','monitor_audit'].map(name=>db.collection(name).createIndex({expires:1},{expireAfterSeconds:0})),
     ...['accounts', 'posts', 'photos', 'comments', 'trips', 'reports', 'destinations', 'places', 'moderation_actions'].map(name => db.collection(name).createIndex({ id: 1 }, { unique: true })),
     db.collection('accounts').createIndex({ username: 1 }, { unique: true, partialFilterExpression: { username: { $type: 'string' } } }),
     db.collection('trips').createIndex({ user_id: 1, key: 1 }, { unique: true }),

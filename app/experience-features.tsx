@@ -1,5 +1,6 @@
 'use client';
 
+import {track} from './monitoring/analytics-client';
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, Camera, MapPin, Search, X, MessageCircle, ArrowRight } from 'lucide-react';
@@ -22,7 +23,7 @@ export function SearchResults({query,category,renderPost,onClear}:{query:string;
         const response=await fetch('/api/search?'+new URLSearchParams({q:query,category}),{signal:controller.signal});
         const data=await response.json() as {posts:Post[];error?:string};
         if(!response.ok)throw Error(data.error);
-        setResult({posts:data.posts,loading:false,error:''});
+        setResult({posts:data.posts,loading:false,error:''});if(!controller.signal.aborted&&query.trim())track('search_destination',{query,results:data.posts.length});
       }catch(error){if(!controller.signal.aborted)setResult({posts:[],loading:false,error:error instanceof Error?error.message:'Search failed.'});}
     },300);
     return()=>{clearTimeout(timer);controller.abort();};

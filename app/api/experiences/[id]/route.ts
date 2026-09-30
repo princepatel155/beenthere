@@ -1,8 +1,9 @@
+import {monitored} from '../../../monitoring/server';
 import { visible,publicPosts } from '../../../product-server';
 import { database } from '../../../../db';
 import { getCurrentUser } from '../../../auth/session';
 
-export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}) {
+async function handleGET(_request:Request,{params}:{params:Promise<{id:string}>}) {
   const {id}=await params;
   if(!/^[a-f0-9-]{36}$/.test(id))return Response.json({error:'Experience not found.'},{status:404});
   try {
@@ -16,3 +17,4 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
     return Response.json({post:(await publicPosts([post],user?.userId))[0],comments},{headers:{'Cache-Control':'private, no-store'}});
   }catch{return Response.json({error:'This experience could not be loaded. Please try again.'},{status:503});}
 }
+export const GET=monitored('/api/experiences/:id',handleGET);
